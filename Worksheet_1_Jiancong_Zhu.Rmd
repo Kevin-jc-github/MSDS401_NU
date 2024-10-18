@@ -1,0 +1,148 @@
+---
+title: "Data Analysis - Worksheet 1"
+author: "Irene Tsapara"
+date: "2023-04-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Worksheet Week 1
+
+**Please review the following document which provides useful background information pertinent to this assignment.Data Analysis Project Instruction.pdf**
+
+**Instructions for the first assignment appear in the Rmd template below.The required abalones.csv data are given below.**
+
+**Save the abalones data on your computer without opening the file in Excel.Do not change the order of the observations in the original file. If you do, your answers may not correspond to the answer sheet and sample report.**
+
+Part 1 Enter your data into a DataFrame and set up your datatypes and values. \*\*\* Section 0 \*\*\* (16 points)
+
+1.  
+    (a) (2 points) Use the getwd() to find your working directory.
+```{r}
+    getwd()
+```
+2.  
+    (b) (2 points)Use the setwd(…) to set your working directory, ensure that your R program and your csv file are in the same directory.
+```{r}
+    setwd("/Users/jiancongzhu/Desktop/MSDS401")
+```
+3.  
+    (c) (2 points) Import the following packages in your R studio ggplot2, gridExtra, psych, knitr, moments
+```{r}
+    #install.packages("ggplot2")
+    #install.packages("gridExtra")
+    #install.packages("psych")
+    #install.packages("knitr")
+    #install.packages("moments")
+```
+4.  
+
+    (d) (2 points) Load the "ggplot2", "gridExtra",”psych” and "knitr" packages
+```{r}
+    library(ggplot2)
+    library(gridExtra)
+    library(psych)
+    library(knitr)
+```
+5.  
+
+    (e) (2 points) Read-in the abalones dataset, defining a new data frame, "mydata,"
+```{r}
+    mydata <- read.csv(file.path("~/Desktop/MSDS401", "abalones.csv"), sep=",")
+```
+6.  
+
+    (f) (2 points) calculate new variables, VOLUME and RATIO.
+```{r}
+    mydata$VOLUME <- mydata$LENGTH * mydata$DIAM *mydata$HEIGHT
+    mydata$RATIO <- mydata$SHUCK / mydata$VOLUME
+```
+7.  
+
+    (g) (2 points) Run str(mydata) and ensure that your data have been read properly. You should expect 1036 observations and 8 variables.
+```{r}
+    str(mydata)
+```
+8.  
+
+    (h) (2 points) Change the values of “SEX”, there are many ways to do this. We will change the levels of SEX from I,M,F to Infant,Male and Female.
+```{r}
+    levels(mydata$SEX)
+    levels(mydata$SEX) <-c("Infant","Male","Female")
+```
+**Do not include package installation code in this document. Packages should be installed via the Console or 'Packages' tab. You will also need to download the abalones.csv from the course site to a known location on your machine.**
+
+```{r Part 1}
+#Hints:
+#1.	Load the ggplot2 and gridExtra packages.
+#a.	library(ggplot2)
+#b.	library(gridExtra)
+#c.	library(knitr)
+#d.	library(moments)
+#e.	library(psych)
+```
+
+```{r Part 1 Readings}
+#2.	Use read.csv() to read the abalones.csv into R, assigning the data frame to "mydata."
+#a.	mydata <- read.csv("abalones.csv", sep = ",", stringsAsFactors = TRUE)
+#b.	The reason we use the separator as “,” is due to the way we have created the csv file with , separators.
+#c.	Another important parameter for the read.csv is header, header is by default TRUE, and this is why you can omit it here.
+#d.	When the header is “FALSE” then the first line of the file will be read as an observation, otherwise, the values are assigned to Columns names. The columns of the dataframe are called variables.
+#3.	The parameter stringsAsFactors = TRUE, changes the datatype of the Character variables to Factors ( Categorical Variables). 
+```
+
+```{Part 1 New Variables}
+#4.	Use the str() function to verify the structure of "mydata." You should have 1036 observations of eight variables.
+#5.	Define two new variables, VOLUME and RATIO. Use the following statements to define VOLUME and
+#6.	RATIO as variables appended to the data frame "mydata."
+
+mydata$VOLUME <- mydata$LENGTH * mydata$DIAM * mydata$HEIGHT
+mydata$RATIO <- mydata$SHUCK / mydata$VOLUME
+```
+
+**7. Use the function levels(mydata\$SEX), you should first run the command to see the order of the levels ( values ), then create a vector with the new levels, in the correct order. To do this use the c(,,,) and insert the Values: INFANT, MALE, FEMALE, in the right order.**
+
+##Part 2 Review the descriptive statistics. ***\##### Section 1: (19 points) Summarizing the data.***
+
+```{r Part 2 Descriptive Statistics part a}
+#(a)	(2 points) Use *summary()* to obtain and present descriptive statistics from mydata, specifically the Five-number descriptive.
+    summary(mydata)
+#(b)	(2 points) Use *describeBy()* to obtain all the descriptive statistics.
+    describeBy(mydata)
+```
+
+**(c) (2 points) Compare the information received in the two steps above. Explain your answer here**
+
+\*\*\* describe(mydata) offers more detailed statistics compared to summary(mydata). It provides insights into the distribution of the data (like skewness and kurtosis) and the spread of values (standard deviation and range), which are not available in the simple summary.What's more, summary(mydata) is useful for a quick overview and to identify any missing values. On the other hand, describeBy(mydata) is more informative when we need to understand the shape and distribution of our data, making it more suitable for detailed exploratory data analysis. \*\*\*
+
+**(d) (2 points) Identify which of the variables have the highest dispersion. What does this mean about the specific characteristic of the abalohi fnes?**
+
+\*\*\* The variable "WHOLE" has the highest dispersion since it has the largest standard deviation of 61.9.This indicates a wide range of variability in the whole weights of abalones in the dataset. This variability shows that the abalones differ significantly in size and weight, and likely due to factors such as age, growth conditions, or genetic diversity. \*\*\*
+
+```{r Part 2 Descriptive Statistics part b}
+
+#(e)	(2 points) Consider the variable that has the highest dispersion and analyze further by SEX. To do this, we will use the function aggregate that allows us to run different functions on subsets of variables that have common characteristics.
+#Use the following function
+#   aggregate(cbind(VOLUME,WIDTH,LENGTH,DIAMETER,RATIO)~SEX,data = mydata,sd) 
+    aggregate(cbind(VOLUME,LENGTH,DIAM,RATI0)-SEx,data  mydata,sd)
+#Repeat the steps for mean and median.
+    aggregate(cbind(VOLUME,LENGTH,DIAM,RATI0)-SEx,data  mydata,mean)
+    aggregate(cbind(VOLUME,LENGTH,DIAM,RATI0)-SEx,data  mydata,median)
+```
+
+```{r Part 2 Tables}
+
+#(f)	(2 points) Use *table()* to present a frequency table using CLASS and RINGS. There should be 115 cells in the table you present. 
+    table(mydata$CLASS, mydata$RINGS)
+#(g)	(2 points) Repeat and Create another table() to present a frequency table using CLASS, SEX. Do you see any similarities?
+    table(mydata$CLASS, mydata$SEX)
+#(h)	(2 points) Repeat and Create another table() to present RINGS and SEX.
+    table(mydata$RINGS, mydata$SEX)
+```
+
+**Essay Question (3 points): Briefly discuss the variable types and distributional implications such as potential skewness and outliers.**
+
+\*\*\* The dataset includes categorical variables like SEX and CLASS, and numeric variables such as RINGS, LENGTH, and WHOLE. The distribution of RINGS might be skewed, with certain age groups more common, indicating a potential concentration around specific ages. Outliers could exist in variables like LENGTH or WHOLE, reflecting significant size variations among abalones. The distribution across SEX shows that some age groups are more prevalent in specific sexes, suggesting underlying biological or environmental influences.\*\*\*
